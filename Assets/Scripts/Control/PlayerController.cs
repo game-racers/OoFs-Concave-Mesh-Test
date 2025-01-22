@@ -76,7 +76,7 @@ namespace gameracers.Control
             if (isPaused == true) return;
 
             // Button Press
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetButtonDown("Fire1"))
             {
                 if (rb.velocity.magnitude > 2f)
                 {
@@ -90,7 +90,7 @@ namespace gameracers.Control
             }
 
             // Button Hold
-            if (Input.GetMouseButton(0))
+            if (Input.GetButton("Fire1"))
             {
                 if (!canSwing) return;
                 power += Input.GetAxis("Mouse Y") * powerMod;
@@ -100,7 +100,7 @@ namespace gameracers.Control
             }
 
             // Button Release
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetButtonUp("Fire1"))
             {
                 if (!canSwing) return;
                 if (Mathf.Approximately(power, 0f)) return;
