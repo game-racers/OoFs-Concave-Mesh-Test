@@ -1846,14 +1846,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3192377241741585199, guid: 06bbd485e2627a94db21a6a379e81a32, type: 3}
-      propertyPath: m_Drag
-      value: 0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 3192377241741585199, guid: 06bbd485e2627a94db21a6a379e81a32, type: 3}
-      propertyPath: m_AngularDrag
-      value: 2.25
-      objectReference: {fileID: 0}
     - target: {fileID: 3501233897748495797, guid: 06bbd485e2627a94db21a6a379e81a32, type: 3}
       propertyPath: m_LocalPosition.x
       value: -37.85
@@ -1894,10 +1886,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4620739298982363940, guid: 06bbd485e2627a94db21a6a379e81a32, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 5399178b02e0d78429f5cf9dc21e76ab, type: 2}
     - target: {fileID: 6428793543330120765, guid: 06bbd485e2627a94db21a6a379e81a32, type: 3}
       propertyPath: m_Sources.Array.data[0].sourceTransform
       value: 
@@ -1905,10 +1893,6 @@ PrefabInstance:
     - target: {fileID: 8151218748293350036, guid: 06bbd485e2627a94db21a6a379e81a32, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 8669575275040025211, guid: 06bbd485e2627a94db21a6a379e81a32, type: 3}
-      propertyPath: powerMax
-      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 8669575275040025211, guid: 06bbd485e2627a94db21a6a379e81a32, type: 3}
       propertyPath: powerDisplay

@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Build;
+using gameracers.MiniGolf.Core;
+using UnityEngine.VFX;
 
 namespace gameracers.Camera
 {
@@ -24,6 +26,38 @@ namespace gameracers.Camera
         Transform player;
         Transform cam;
 
+        bool doMove = false;
+
+
+        private void OnEnable()
+        {
+            GolfEventListener.onChangeGameState += ToggleInput;
+        }
+
+        private void OnDisable()
+        {
+            GolfEventListener.onChangeGameState -= ToggleInput;
+        }
+
+        private void ToggleInput(MiniGolfState newState)
+        {
+            switch (newState)
+            {
+                case MiniGolfState.GameStart:
+                    doMove = false;
+                    break;
+                case MiniGolfState.PauseScreen:
+                    doMove = false;
+                    break;
+                case MiniGolfState.MiniGolf:
+                    doMove = true;
+                    break;
+                case MiniGolfState.InBetween:
+                    doMove = true;
+                    break;
+            }
+        }
+
         void Start()
         {
             player = GameObject.FindWithTag("Player").transform;
@@ -33,6 +67,8 @@ namespace gameracers.Camera
 
         void LateUpdate()
         {
+            if (doMove == false) return;
+
             #region Zoom In and Out
             if (cam.localPosition.z < -minDist && Input.mouseScrollDelta.y > 0)
             {

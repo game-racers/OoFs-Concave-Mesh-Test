@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using Unity.VisualScripting;
+using gameracers.MiniGolf.Core;
 
 namespace gameracers.MiniGolf.Control
 {
@@ -22,7 +23,7 @@ namespace gameracers.MiniGolf.Control
         bool canSwing;
         bool roundOver = false;
 
-        bool isPaused = false;
+        bool isPaused = true;
 
         Rigidbody rb;
 
@@ -32,23 +33,21 @@ namespace gameracers.MiniGolf.Control
 
         private void OnEnable()
         {
-            EventListener.onChangeGameState += ChangingState;
-            EventListener.onChangeEquipment += UpdateEquipment;
+            GolfEventListener.onChangeGameState += ChangingState;
         }
 
         private void OnDisable()
         {
-            EventListener.onChangeGameState -= ChangingState;
-            EventListener.onChangeEquipment -= UpdateEquipment;
+            GolfEventListener.onChangeGameState -= ChangingState;
         }
 
-        private void ChangingState(GameState newState)
+        private void ChangingState(MiniGolfState newState)
         {
-            if (newState == GameState.PauseScreen)
+            if (newState == MiniGolfState.PauseScreen || newState == MiniGolfState.GameStart || newState == MiniGolfState.InBetween)
             {
                 isPaused = true;
             }
-            else if (newState == GameState.FreeRoam || newState == GameState.MiniGolf)
+            else if (newState == MiniGolfState.MiniGolf)
             {
                 isPaused = false;
             }
@@ -62,6 +61,7 @@ namespace gameracers.MiniGolf.Control
         void Start()
         {
             cam = transform.GetChild(0).GetChild(0);
+            //cam.gameObject.SetActive(false);
             powerBar = powerDisplay.GetChild(0).GetComponent<Image>();
             powerDisplay.gameObject.SetActive(false);
             facing = transform.Find("Facing");

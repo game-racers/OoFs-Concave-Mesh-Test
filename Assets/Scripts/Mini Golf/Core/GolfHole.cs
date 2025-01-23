@@ -10,11 +10,17 @@ namespace gameracers.MiniGolf.Core
 {
     public class GolfHole : MonoBehaviour
     {
-        [SerializeField] ClawMovement claw;
+        ClawMovement claw;
         [SerializeField] float moveDur = 1f;
         [SerializeField] float clawVertMovement = 10f;
+        Transform player;
         float timer;
         bool isEndLevel = false;
+
+        private void Start()
+        {
+            claw = GameObject.FindWithTag("Claw").GetComponent<ClawMovement>();
+        }
 
         private void OnTriggerEnter(Collider other)
         {
@@ -22,13 +28,15 @@ namespace gameracers.MiniGolf.Core
 
             MiniGolfPlayerController pc = other.GetComponent<MiniGolfPlayerController>();
 
+            player = other.transform;
             pc.StopInput(true);
             claw.gameObject.SetActive(true);
             claw.transform.position = transform.parent.Find("Claw Spawn").position;
-            claw.transform.DOMove(claw.transform.position + Vector3.down * clawVertMovement, moveDur);
+            claw.transform.DOMove(player.position, moveDur);
             claw.OpenClaw();
             timer = Time.time;
             isEndLevel = true;
+            GolfEventListener.BallSunkInHole(player);
         }
 
         private void Update()
@@ -40,6 +48,7 @@ namespace gameracers.MiniGolf.Core
                     claw.CloseClaw();
                     claw.GrabTransform(GameObject.FindWithTag("Player").transform);
                     claw.transform.DOMove(claw.transform.position + Vector3.up * clawVertMovement, moveDur);
+                    timer = Mathf.Infinity;
                     //scoreBoard.gameObject.SetActive(true);
                 }
             }

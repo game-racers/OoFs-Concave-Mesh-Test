@@ -35,6 +35,11 @@ namespace gameracers.MiniGolf.Aesthetics
             claw1Hinge.DOLocalRotate(claw1Open, openDur);
             claw2Hinge.DORotate(claw2Open, openDur);
             claw3Hinge.DORotate(claw3Open, openDur);
+            if (hasTransform)
+            {
+                heldTransform = null;
+                hasTransform = false;
+            }
         }
 
         public void CloseClaw()
@@ -54,7 +59,7 @@ namespace gameracers.MiniGolf.Aesthetics
         {
             if (hasTransform == true)
             {
-                heldTransform.transform.position = transform.parent.position;
+                heldTransform.transform.position = transform.position;
             }
         }
     }
