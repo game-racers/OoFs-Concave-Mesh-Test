@@ -122,6 +122,7 @@ namespace gameracers.MiniGolf.Control
                 Vector3 facing = transform.position - cam.position;
                 facing = new Vector3(facing.x, 0, facing.z);
                 rb.AddForce(facing * power);
+                AudioManager.am.PlayStrikeSound();
                 lastPos = transform.position;
                 canSwing = false;
                 swings += 1;
