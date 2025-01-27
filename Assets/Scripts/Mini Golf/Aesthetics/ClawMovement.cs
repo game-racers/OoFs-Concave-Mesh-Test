@@ -22,12 +22,23 @@ namespace gameracers.MiniGolf.Aesthetics
         bool hasTransform;
         Transform heldTransform;
 
+        [SerializeField] float moveTimer = 1.5f;
+        [SerializeField] float dropDelay = .5f;
+        float timer = Mathf.Infinity;
+        
+
         void Start()
         {
             claw1Close = new Vector3(270, 90, -90);
             claw1Hinge.eulerAngles = claw1Close;
             claw2Close = claw2Hinge.eulerAngles;
             claw3Close = claw3Hinge.eulerAngles;
+        }
+
+        public void MoveToPos(Vector3 pos)
+        {
+            timer = Time.time;
+            transform.DOMove(pos, moveTimer);
         }
 
         public void OpenClaw()
@@ -60,6 +71,16 @@ namespace gameracers.MiniGolf.Aesthetics
             if (hasTransform == true)
             {
                 heldTransform.transform.position = transform.position;
+            }
+
+            if (timer != Mathf.Infinity)
+            {
+                if (Time.time - timer > moveTimer + dropDelay)
+                {
+                    OpenClaw();
+                    timer = Mathf.Infinity;
+                    GolfEventListener.RoundStart();
+                }
             }
         }
     }

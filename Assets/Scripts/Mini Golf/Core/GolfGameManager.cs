@@ -3,16 +3,22 @@ using UnityEngine;
 using DG.Tweening;
 using System.Collections.Generic;
 using UnityEngine.Assertions.Must;
+using gameracers.MiniGolf.Control;
+using TMPro;
+using gameracers.MiniGolf.Aesthetics;
+using Unity.VisualScripting;
 
 namespace gameracers.MiniGolf.Core
 {
     public class GolfGameManager : MonoBehaviour
     {
-        MiniGolfState gameState = MiniGolfState.GameStart;
+        [SerializeField] MiniGolfState gameState = MiniGolfState.GameStart;
         MiniGolfState lastState = MiniGolfState.GameStart;
         [SerializeField] GameObject pauseMenu;
         [SerializeField] Image blackScreen;
-        [SerializeField] GameObject scoreBoard;
+        [SerializeField] RectTransform scoreBoard;
+        Transform playerScores;
+        TextMeshProUGUI playerTotal;
 
         float startTimer = -Mathf.Infinity;
         [SerializeField] float ballEnterDur = 3.5f;
@@ -23,6 +29,11 @@ namespace gameracers.MiniGolf.Core
 
         Transform player;
         int currentHole = 0;
+        int currentHoleScore;
+        int totalScore;
+        ClawMovement claw;
+        bool canChangeHole = false;
+
 
         [SerializeField] List<GameObject> holes = new List<GameObject>();
         [SerializeField] GameObject mainLand;
@@ -32,22 +43,43 @@ namespace gameracers.MiniGolf.Core
         private void Start()
         {
             player = GameObject.FindWithTag("Player").transform;
+            playerScores = scoreBoard.GetChild(0).Find("Player Scores");
+            playerTotal = scoreBoard.GetChild(0).Find("Player Total").GetComponent<TextMeshProUGUI>();
+            claw = GameObject.FindWithTag("Claw").GetComponent<ClawMovement>();
         }
 
         private void OnEnable()
         {
             GolfEventListener.onBallInHole += InBetweenHoles;
+            GolfEventListener.onClawDrop += RoundStart;
         }
 
         private void OnDisable()
         {
             GolfEventListener.onBallInHole -= InBetweenHoles;
+            GolfEventListener.onClawDrop -= RoundStart;
         }
 
         private void InBetweenHoles(Transform player)
         {
+            currentHoleScore = player.GetComponent<MiniGolfPlayerController>().GetSwings();
+            player.GetComponent<MiniGolfPlayerController>().ResetSwings();
+            totalScore += currentHoleScore;
+            UpdateScore();
+
             ChangeGameState(MiniGolfState.InBetween);
             ballEnterTimer = Time.time;
+        }
+
+        private void RoundStart()
+        {
+            ChangeGameState(MiniGolfState.MiniGolf);
+        }
+
+        private void UpdateScore()
+        {
+            playerScores.GetChild(currentHole).GetComponent<TextMeshProUGUI>().text = currentHoleScore.ToString();
+            playerTotal.text = totalScore.ToString();
         }
 
         private void Update()
@@ -69,11 +101,16 @@ namespace gameracers.MiniGolf.Core
             {
                 if (Time.time - ballEnterTimer > ballEnterDur)
                 {
-                    scoreBoard.SetActive(true);
-                    Cursor.lockState = CursorLockMode.None;
-                    Cursor.visible = true;
+                    canChangeHole = true;
+                    scoreBoard.gameObject.SetActive(true);
                     ballEnterTimer = Mathf.Infinity;
                 }
+                if (ballEnterTimer == Mathf.Infinity && Input.anyKeyDown)
+                {
+                    if (canChangeHole == true) 
+                        NextHole();
+                }
+
                 return;
             }    
 
@@ -117,9 +154,14 @@ namespace gameracers.MiniGolf.Core
         public void NextHole()
         {
             // move player by moving claw
+            if (canChangeHole == false) return;
             holes[currentHole].SetActive(false);
+            canChangeHole = false;
             currentHole += 1;
             holes[currentHole].SetActive(true);
+            scoreBoard.gameObject.SetActive(false);
+
+            claw.MoveToPos(holes[currentHole].transform.Find("Hole Start").position);
 
             if (currentHole == 3 - 1)
             {

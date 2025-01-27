@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using UnityEngine;
 using Unity.VisualScripting;
 using gameracers.MiniGolf.Core;
+using System.Runtime.InteropServices;
+using DG.Tweening;
 
 namespace gameracers.MiniGolf.Control
 {
@@ -23,11 +25,14 @@ namespace gameracers.MiniGolf.Control
         bool canSwing;
         bool roundOver = false;
 
-        bool isPaused = true;
+        [SerializeField] bool isPaused = true;
 
         Rigidbody rb;
+        SphereCollider sc;
 
         List<Equipment> equipment = new List<Equipment>();
+
+        Vector3 lastPos;
 
         int swings;
 
@@ -50,6 +55,8 @@ namespace gameracers.MiniGolf.Control
             else if (newState == MiniGolfState.MiniGolf)
             {
                 isPaused = false;
+                StopInput(false);
+                lastPos = transform.position;
             }
         }
 
@@ -66,6 +73,7 @@ namespace gameracers.MiniGolf.Control
             powerDisplay.gameObject.SetActive(false);
             facing = transform.Find("Facing");
             rb = GetComponent<Rigidbody>();
+            sc = GetComponent<SphereCollider>();
 
             CheckInventory();
         }
@@ -114,6 +122,7 @@ namespace gameracers.MiniGolf.Control
                 Vector3 facing = transform.position - cam.position;
                 facing = new Vector3(facing.x, 0, facing.z);
                 rb.AddForce(facing * power);
+                lastPos = transform.position;
                 canSwing = false;
                 swings += 1;
             }
@@ -157,9 +166,20 @@ namespace gameracers.MiniGolf.Control
 
         public void StopInput(bool doStop)
         {
-            ResetVelocity();
-            roundOver = doStop;
-            rb.useGravity = !doStop;
+            if (doStop)
+            {
+                rb.velocity = Vector3.zero;
+                roundOver = doStop;
+                rb.useGravity = !doStop;
+                sc.enabled = !doStop;
+            }
+            else
+            {
+                rb.velocity = Vector3.zero;
+                roundOver = doStop;
+                rb.useGravity = !doStop;
+                sc.enabled = !doStop;
+            }
         }
 
         public int GetSwings()
@@ -167,19 +187,28 @@ namespace gameracers.MiniGolf.Control
             return swings;
         }
 
-        public void AddSwing()
+        public void Sink(float dur)
+        {
+            // Player sinks into whatever surface they collide with slowly to show the mistake in slow-mo
+
+            Vector3 tempVel = (rb.velocity.normalized + Vector3.down * 2f).normalized;
+            StopInput(true);
+            transform.DOMove(tempVel, dur);
+        }
+
+        public void AddSwing(bool doReturnToLastPos)
         {
             swings += 1;
+            if (doReturnToLastPos)
+            {
+                transform.position = lastPos;
+                StopInput(false);
+            }
         }
 
         public void ResetSwings()
         {
             swings = 0;
-        }
-
-        public void ResetVelocity()
-        {
-            rb.velocity = Vector3.zero;
         }
     }
 }
