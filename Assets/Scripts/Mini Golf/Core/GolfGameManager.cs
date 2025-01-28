@@ -82,6 +82,16 @@ namespace gameracers.MiniGolf.Core
             playerTotal.text = totalScore.ToString();
         }
 
+        private void ResetScore()
+        {
+            foreach (Transform child in playerScores)
+            {
+                child.GetComponent<TextMeshProUGUI>().text = "";
+            }
+
+            playerTotal.text = "";
+        }
+
         private void Update()
         {
             if (startTimer != -Mathf.Infinity)
@@ -113,6 +123,27 @@ namespace gameracers.MiniGolf.Core
 
                 return;
             }    
+
+            if (gameState == MiniGolfState.EndScreen)
+            {
+                if (Time.time - ballEnterTimer > ballEnterDur)
+                {
+                    canChangeHole = true;
+                    scoreBoard.gameObject.SetActive(true);
+                    ballEnterTimer = Mathf.Infinity;
+                }
+                if (ballEnterTimer == Mathf.Infinity && Input.anyKeyDown)
+                {
+                    if (canChangeHole == true)
+                    {
+                        blackScreen.DOColor(Color.black, beginDur);
+                        // Credits is already displayed due to the Play Button actually deactivates "Main Menu" and activates "Credits" under the Main Menu Canvas
+                        blackScreen.DOColor(Color.clear, beginDur);
+                        ChangeGameState(MiniGolfState.GameStart);
+                        ResetScore();
+                    }
+                }
+            }
 
             if (gameState == MiniGolfState.GameStart) return;
 
@@ -154,6 +185,15 @@ namespace gameracers.MiniGolf.Core
         public void NextHole()
         {
             // move player by moving claw
+            if (currentHole == holes.Count)
+            {
+                // reveal Game Over Screen en
+                ChangeGameState(MiniGolfState.EndScreen);
+                UpdateScore();
+                scoreBoard.gameObject.SetActive(true);
+                return;
+            }
+
             if (canChangeHole == false) return;
             holes[currentHole].SetActive(false);
             canChangeHole = false;
@@ -189,6 +229,7 @@ namespace gameracers.MiniGolf.Core
         GameStart,
         PauseScreen,
         MiniGolf,
-        InBetween
+        InBetween, 
+        EndScreen
     }
 }
