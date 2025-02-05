@@ -183,6 +183,11 @@ namespace gameracers.MiniGolf.Control
             }
         }
 
+        public void ChangeSensitivity(float val)
+        {
+            powerMod = val;
+        }
+
         public int GetSwings()
         {
             return swings;

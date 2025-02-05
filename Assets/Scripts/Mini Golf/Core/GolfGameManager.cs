@@ -42,6 +42,8 @@ namespace gameracers.MiniGolf.Core
 
         private void Start()
         {
+            //Application.targetFrameRate = 60;
+
             player = GameObject.FindWithTag("Player").transform;
             playerScores = scoreBoard.GetChild(0).Find("Player Scores");
             playerTotal = scoreBoard.GetChild(0).Find("Player Total").GetComponent<TextMeshProUGUI>();
@@ -221,6 +223,36 @@ namespace gameracers.MiniGolf.Core
         {
             gameState = newState;
             GolfEventListener.GameStateChange(newState);
+        }
+
+        public MiniGolfState GetGameState()
+        {
+            return gameState;
+        }
+
+        public void ChangeFPS(int val)
+        {
+            switch (val)
+            {
+                case 0: // 30 fps
+                    QualitySettings.vSyncCount = 0;
+                    Application.targetFrameRate = 30;
+                    break;
+                case 1: // 60 fps
+                    QualitySettings.vSyncCount = 0;
+                    Application.targetFrameRate = 60;
+                    break;
+                case 2: // 120 fps
+                    Application.targetFrameRate = 120;
+                    break;
+                case 3: // 240 fps
+                    Application.targetFrameRate = 240;
+                    break;
+                case 4: // unlimitted
+                    Application.targetFrameRate = 1000;
+                    break;
+
+            }
         }
     }
 

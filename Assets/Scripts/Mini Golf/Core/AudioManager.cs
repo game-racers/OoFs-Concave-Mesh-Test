@@ -1,10 +1,15 @@
+using gameracers.MiniGolf.Core;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class AudioManager : MonoBehaviour
 {
+    [SerializeField] AudioMixer masterMixer;
+
+
     public static AudioManager am;
     
     [SerializeField] List<AudioClip> musicList = new List<AudioClip>();  
@@ -20,6 +25,10 @@ public class AudioManager : MonoBehaviour
 
     AudioSource playerRollSC;
     AudioSource playerStrokeSC;
+
+    GolfGameManager gm;
+    GameObject optionsTemp;
+    [SerializeField] GameObject menuBG;
 
     private void Awake()
     {
@@ -41,6 +50,8 @@ public class AudioManager : MonoBehaviour
 
         playerRollSC = GameObject.FindWithTag("Player").transform.Find("Roll Source").GetComponent<AudioSource>();
         playerStrokeSC = GameObject.FindWithTag("Player").transform.Find("Stroke Source").GetComponent<AudioSource>();
+
+        gm = GameObject.FindWithTag("GameController").GetComponent<GolfGameManager>();
     }
 
     public void WaterHazardSound(Vector3 pos)
@@ -69,4 +80,41 @@ public class AudioManager : MonoBehaviour
         sfxSC.clip = clip;
         sfxSC.Play();
     }
+
+    #region UI Elements
+    public void ChangeMaster(float val)
+    {
+        masterMixer.SetFloat("Master", Mathf.Log10(val) * 20);
+    }
+
+    public void ChangeMusic(float val)
+    {
+        masterMixer.SetFloat("Music", Mathf.Log10(val) * 20);
+    }
+
+    public void ChangeSFX(float val)
+    {
+        masterMixer.SetFloat("SFX", Mathf.Log10(val) * 20);
+    }
+
+    public void ChangeDialogue(float val)
+    {
+        masterMixer.SetFloat("Dialogue", Mathf.Log10(val) * 20);
+    }
+
+    public void BackButton()
+    {
+        if (gm.GetGameState() == MiniGolfState.GameStart)
+        {
+            menuBG.SetActive(true);
+            menuBG.transform.GetChild(0).gameObject.SetActive(true);
+        }
+        else
+        {
+            gm.ChangeGameState(MiniGolfState.MiniGolf);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false; 
+        }
+    }
+    #endregion
 }

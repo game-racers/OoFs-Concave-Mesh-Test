@@ -22,12 +22,12 @@ namespace gameracers.MiniGolf.Control
             ejectPos = transform.GetChild(0).position;
         }
 
-        private void OnCollisionEnter(Collision collision)
+        private void OnTriggerEnter(Collider other)
         {
-            if (collision.gameObject.tag == "Player")
+            if (other.gameObject.tag == "Player")
             {
                 timer = Time.time;
-                pc = collision.transform.GetComponent<MiniGolfPlayerController>();
+                pc = other.transform.GetComponent<MiniGolfPlayerController>();
                 pc.StopInput(true);
                 pc.transform.DOMove(ejectPos, dur);
             }
