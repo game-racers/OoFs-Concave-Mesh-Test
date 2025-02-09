@@ -18,7 +18,8 @@ public class WaterHazard : MonoBehaviour
             waterHazard.SetActive(true);
             timer = Time.time;
             pc = collision.transform.GetComponent<MiniGolfPlayerController>();
-            // play spash sound
+
+            AudioManager.am.WaterHazardSound(collision.transform.position);
         }
     }
 

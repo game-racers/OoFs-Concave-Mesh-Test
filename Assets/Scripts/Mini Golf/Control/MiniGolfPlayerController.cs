@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 using gameracers.MiniGolf.Core;
 using System.Runtime.InteropServices;
 using DG.Tweening;
+using TMPro;
 
 namespace gameracers.MiniGolf.Control
 {
@@ -25,7 +26,7 @@ namespace gameracers.MiniGolf.Control
         bool canSwing;
         bool roundOver = false;
 
-        [SerializeField] bool isPaused = true;
+        bool isPaused = true;
 
         Rigidbody rb;
         SphereCollider sc;
@@ -35,6 +36,7 @@ namespace gameracers.MiniGolf.Control
         Vector3 lastPos;
 
         int swings;
+        [SerializeField] TextMeshProUGUI strokeCounter;
 
         private void OnEnable()
         {
@@ -125,7 +127,7 @@ namespace gameracers.MiniGolf.Control
                 AudioManager.am.PlayStrikeSound();
                 lastPos = transform.position;
                 canSwing = false;
-                swings += 1;
+                AddSwing(false);
             }
         }
 
@@ -205,6 +207,7 @@ namespace gameracers.MiniGolf.Control
         public void AddSwing(bool doReturnToLastPos)
         {
             swings += 1;
+            strokeCounter.text = swings.ToString();
             if (doReturnToLastPos)
             {
                 transform.position = lastPos;
@@ -215,6 +218,7 @@ namespace gameracers.MiniGolf.Control
         public void ResetSwings()
         {
             swings = 0;
+            strokeCounter.text = "0";
         }
     }
 }

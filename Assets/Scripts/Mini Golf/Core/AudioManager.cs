@@ -1,6 +1,8 @@
+using gameracers.Dialogue;
 using gameracers.MiniGolf.Core;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -54,6 +56,17 @@ public class AudioManager : MonoBehaviour
         gm = GameObject.FindWithTag("GameController").GetComponent<GolfGameManager>();
     }
 
+    private void Update()
+    {
+        if (!dialogueSC.isPlaying)
+        {
+            if (dialogueSC.clip != dialogueList[0])
+            {
+                DialogueManager.dm.CloseTextBauble();
+            }
+        }
+    }
+
     public void WaterHazardSound(Vector3 pos)
     {
         AudioSource.PlayClipAtPoint(waterList[Random.Range(0, waterList.Count)], pos);
@@ -79,6 +92,14 @@ public class AudioManager : MonoBehaviour
     {
         sfxSC.clip = clip;
         sfxSC.Play();
+    }
+
+    public void PlayDialogue(int index)
+    {
+        Debug.Log(dialogueList[index].name);
+        dialogueSC.clip = dialogueList[index];
+        dialogueSC.Play();
+        DialogueManager.dm.NextHoleText(index - 1);
     }
 
     #region UI Elements
@@ -108,6 +129,7 @@ public class AudioManager : MonoBehaviour
         {
             menuBG.SetActive(true);
             menuBG.transform.GetChild(0).gameObject.SetActive(true);
+            DialogueManager.dm.gameObject.SetActive(true);
         }
         else
         {

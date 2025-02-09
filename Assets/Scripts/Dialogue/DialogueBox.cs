@@ -19,14 +19,9 @@ namespace gameracers.Dialogue
 
         public void UpdateText(string name, string dialogue)
         {
-            gameObject.SetActive(true);
             mainText.text = dialogue;
             nameText.text = name;
+            gameObject.SetActive(true);
         }
-
-        // check for next button or interact. 
-        // will be in update
-        // close text func
-
     }
 }

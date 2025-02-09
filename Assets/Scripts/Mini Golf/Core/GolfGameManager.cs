@@ -7,6 +7,7 @@ using gameracers.MiniGolf.Control;
 using TMPro;
 using gameracers.MiniGolf.Aesthetics;
 using Unity.VisualScripting;
+using gameracers.Dialogue;
 
 namespace gameracers.MiniGolf.Core
 {
@@ -180,6 +181,7 @@ namespace gameracers.MiniGolf.Core
             Cursor.visible = false;
 
             // voice lines
+            AudioManager.am.PlayDialogue(1);
 
             startTimer = Time.time;
         }
@@ -193,6 +195,12 @@ namespace gameracers.MiniGolf.Core
                 ChangeGameState(MiniGolfState.EndScreen);
                 UpdateScore();
                 scoreBoard.gameObject.SetActive(true);
+                if (totalScore > 37)
+                    AudioManager.am.PlayDialogue(currentHole + 2);
+                else if (totalScore == 37)
+                    AudioManager.am.PlayDialogue(currentHole + 3);
+                else
+                    AudioManager.am.PlayDialogue(currentHole + 4);
                 return;
             }
 
@@ -200,6 +208,8 @@ namespace gameracers.MiniGolf.Core
             holes[currentHole].SetActive(false);
             canChangeHole = false;
             currentHole += 1;
+
+            AudioManager.am.PlayDialogue(currentHole + 1);
             holes[currentHole].SetActive(true);
             scoreBoard.gameObject.SetActive(false);
 
