@@ -5,21 +5,26 @@ using UnityEngine;
 
 public class WaterHazard : MonoBehaviour
 {
-    [SerializeField] static float punishmentDelay = 3f;
+    [SerializeField] float punishmentDelay = 3f;
     [SerializeField] GameObject waterHazard;
+    [SerializeField] LayerMask badMask;
 
     float timer = Mathf.Infinity;
     MiniGolfPlayerController pc;
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if ((badMask & (1 << gameObject.layer)) != 0)
         {
-            waterHazard.SetActive(true);
-            timer = Time.time;
-            pc = collision.transform.GetComponent<MiniGolfPlayerController>();
+            Debug.Log("Hello World");
+            if (collision.gameObject.tag == "Player")
+            {
+                waterHazard.SetActive(true);
+                timer = Time.time;
+                pc = collision.transform.GetComponent<MiniGolfPlayerController>();
 
-            AudioManager.am.WaterHazardSound(collision.transform.position);
+                AudioManager.am.WaterHazardSound(collision.transform.position);
+            }
         }
     }
 

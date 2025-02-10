@@ -217,17 +217,40 @@ namespace gameracers.MiniGolf.Core
 
             claw.MoveToPos(holes[currentHole].transform.Find("Hole Start").position);
 
-            if (currentHole == 3 - 1)
+            Debug.Log(currentHole);
+            switch (currentHole + 1)
             {
-                hole3Cover.SetActive(false);
-            }
-            if (currentHole > 8 - 1)
-            {
-                mainLand.SetActive(false);
-            }
-            if (currentHole == 9 - 1)
-            {
-                hole8Cover.SetActive(true);
+                case 1:
+                    mainLand.layer = LayerMask.NameToLayer("Out of Bounds");
+                    hole3Cover.SetActive(true);
+                    break;
+                case 2:
+                    mainLand.layer = LayerMask.NameToLayer("Grass");
+                    hole3Cover.SetActive(true);
+                    break;
+                case 3:
+                    mainLand.layer = LayerMask.NameToLayer("Grass");
+                    hole3Cover.SetActive(false);
+                    break;
+                case 4:
+                    mainLand.layer = LayerMask.NameToLayer("Out of Bounds");
+                    break;
+                case 5:
+                    mainLand.layer = LayerMask.NameToLayer("Out of Bounds");
+                    break;
+                case 6:
+                    mainLand.layer = LayerMask.NameToLayer("Out of Bounds");
+                    break;
+                case 7:
+                    mainLand.layer = LayerMask.NameToLayer("Out of Bounds");
+                    break;
+                case 8:
+                    mainLand.SetActive(false);
+                    break;
+                case 9:
+                    mainLand.SetActive(false);
+                    hole8Cover.SetActive(true);
+                    break;
             }
         }
 

@@ -37,6 +37,7 @@ namespace gameracers.MiniGolf.Control
 
         int swings;
         [SerializeField] TextMeshProUGUI strokeCounter;
+        [SerializeField] GameObject outOfBoundsScreen;
 
         private void OnEnable()
         {
