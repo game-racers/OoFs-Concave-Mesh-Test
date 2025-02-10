@@ -96,7 +96,6 @@ public class AudioManager : MonoBehaviour
 
     public void PlayDialogue(int index)
     {
-        Debug.Log(dialogueList[index].name);
         dialogueSC.clip = dialogueList[index];
         dialogueSC.Play();
         DialogueManager.dm.NextHoleText(index - 1);

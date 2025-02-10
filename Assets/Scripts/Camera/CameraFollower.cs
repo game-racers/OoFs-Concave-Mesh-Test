@@ -1,9 +1,5 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Build;
 using gameracers.MiniGolf.Core;
-using UnityEngine.VFX;
 
 namespace gameracers.Camera
 {

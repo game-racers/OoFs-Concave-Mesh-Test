@@ -1,11 +1,6 @@
 using gameracers.Core;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditorInternal.VersionControl;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 namespace gameracers.Inventory
 {

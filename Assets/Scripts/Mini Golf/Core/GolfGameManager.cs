@@ -101,8 +101,10 @@ namespace gameracers.MiniGolf.Core
             {
                 if (Time.time - startTimer > beginDur)
                 {
-                    //disable main camera
+                    // switch cams
                     mainCam.SetActive(false);
+                    player.Find("CameraCenter").GetChild(0).gameObject.SetActive(true);
+
                     //playercam fades away from black
                     blackScreen.DOColor(Color.clear, beginDur);
                     ChangeGameState(MiniGolfState.MiniGolf);
