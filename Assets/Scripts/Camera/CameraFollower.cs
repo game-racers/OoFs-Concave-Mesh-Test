@@ -24,6 +24,7 @@ namespace gameracers.Camera
 
         bool doMove = false;
 
+        [SerializeField] Material[] wallMats;
 
         private void OnEnable()
         {
@@ -57,8 +58,12 @@ namespace gameracers.Camera
         void Start()
         {
             player = GameObject.FindWithTag("Player").transform;
-            cam = player.GetChild(0);
+            cam = player.GetChild(0).GetChild(0);
             startingHeight = cam.localPosition.y;
+            foreach (Material mat in wallMats)
+            {
+                mat.SetFloat("_SeeThroughDist", Mathf.Abs(cam.localPosition.z));
+            }
         }
 
         void LateUpdate()
@@ -66,6 +71,7 @@ namespace gameracers.Camera
             if (doMove == false) return;
 
             #region Zoom In and Out
+            // Zoom In
             if (cam.localPosition.z < -minDist && Input.mouseScrollDelta.y > 0)
             {
                 cam.localPosition += Vector3.forward * scrollMult * Time.deltaTime;
@@ -73,13 +79,24 @@ namespace gameracers.Camera
                 {
                     cam.localPosition = new Vector3(0f, startingHeight, -minDist);
                 }
+
+                foreach (Material mat in wallMats)
+                {
+                    mat.SetFloat("_SeeThroughDist", Mathf.Abs(cam.localPosition.z));
+                }
             }
+            // Zoom Out
             else if (cam.localPosition.z > -maxDist && Input.mouseScrollDelta.y < 0)
             {
                 cam.localPosition -= Vector3.forward * scrollMult * Time.deltaTime;
                 if (cam.localPosition.z < -maxDist)
                 {
                     cam.localPosition = new Vector3(0f, startingHeight, -maxDist);
+                }
+
+                foreach (Material mat in wallMats)
+                {
+                    mat.SetFloat("_SeeThroughDist", Mathf.Abs(cam.localPosition.z));
                 }
             }
             #endregion

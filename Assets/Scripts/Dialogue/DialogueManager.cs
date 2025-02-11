@@ -12,7 +12,6 @@ namespace gameracers.Dialogue
         [SerializeField] TextAsset holeText;
         [SerializeField] TextAsset winText;
 
-        int holeCounter = 0;
         DialogueBox db;
 
         public static DialogueManager dm;

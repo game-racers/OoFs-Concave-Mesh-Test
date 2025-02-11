@@ -28,7 +28,7 @@ namespace gameracers.MiniGolf.Control
             {
                 timer = Time.time;
                 pc = other.transform.GetComponent<MiniGolfPlayerController>();
-                pc.StopInput(true);
+                pc.FreezeCharacter(true);
                 pc.transform.DOMove(ejectPos, dur);
             }
         }
@@ -40,7 +40,7 @@ namespace gameracers.MiniGolf.Control
             {
                 if (Time.time - timer > dur)
                 {
-                    pc.StopInput(false);
+                    pc.FreezeCharacter(false);
                     pc.transform.GetComponent<Rigidbody>().AddForce(ejectDir * power);
                     pc = null;
                 }

@@ -29,7 +29,7 @@ namespace gameracers.MiniGolf.Core
             MiniGolfPlayerController pc = other.GetComponent<MiniGolfPlayerController>();
 
             player = other.transform;
-            pc.StopInput(true);
+            pc.FreezeCharacter(true);
             claw.gameObject.SetActive(true);
             claw.transform.position = transform.parent.Find("Claw Spawn").position;
             claw.transform.DOMove(player.position, moveDur);

@@ -8,6 +8,7 @@ using gameracers.MiniGolf.Core;
 using System.Runtime.InteropServices;
 using DG.Tweening;
 using TMPro;
+using System.Net;
 
 namespace gameracers.MiniGolf.Control
 {
@@ -37,7 +38,7 @@ namespace gameracers.MiniGolf.Control
 
         int swings;
         [SerializeField] TextMeshProUGUI strokeCounter;
-        [SerializeField] GameObject outOfBoundsScreen;
+        [SerializeField] Image strikeImage;
 
         private void OnEnable()
         {
@@ -58,7 +59,7 @@ namespace gameracers.MiniGolf.Control
             else if (newState == MiniGolfState.MiniGolf)
             {
                 isPaused = false;
-                StopInput(false);
+                FreezeCharacter(false);
                 lastPos = transform.position;
             }
         }
@@ -90,6 +91,21 @@ namespace gameracers.MiniGolf.Control
                 powerDisplay.gameObject.SetActive(false);
 
                 return;
+            }
+
+            // update canStrike
+            if (canSwing == false || !Input.GetMouseButton(0))
+            {
+                if (rb.velocity.magnitude > 2f)
+                {
+                    canSwing = false;
+                    strikeImage.color = new Color(1, 1, 1, .25f);
+                }
+                else
+                {
+                    canSwing = true;
+                    strikeImage.color = new Color(1, 1, 1, 1);
+                }
             }
 
             // Button Press
@@ -170,6 +186,11 @@ namespace gameracers.MiniGolf.Control
 
         public void StopInput(bool doStop)
         {
+            roundOver = doStop;
+        }
+
+        public void FreezeCharacter(bool doStop)
+        {
             if (doStop)
             {
                 rb.velocity = Vector3.zero;
@@ -194,15 +215,6 @@ namespace gameracers.MiniGolf.Control
         public int GetSwings()
         {
             return swings;
-        }
-
-        public void Sink(float dur)
-        {
-            // Player sinks into whatever surface they collide with slowly to show the mistake in slow-mo
-
-            Vector3 tempVel = (rb.velocity.normalized + Vector3.down * 2f).normalized;
-            StopInput(true);
-            transform.DOMove(tempVel, dur);
         }
 
         public void AddSwing(bool doReturnToLastPos)
