@@ -29,6 +29,8 @@ namespace gameracers.MiniGolf.Control
 
         bool isPaused = true;
 
+        bool isHazard = false;
+
         Rigidbody rb;
         SphereCollider sc;
 
@@ -206,6 +208,22 @@ namespace gameracers.MiniGolf.Control
                 sc.enabled = !doStop;
             }
         }
+
+        public void SetHazard()
+        {
+            isHazard = true;
+        }
+
+        public bool GetHazard()
+        {
+            return isHazard;
+        }
+
+        public void ResetHazard()
+        {
+            isHazard = false;
+        }
+
 
         public void ChangeSensitivity(float val)
         {

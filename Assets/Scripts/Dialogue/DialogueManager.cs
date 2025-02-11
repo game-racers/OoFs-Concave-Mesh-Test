@@ -27,6 +27,7 @@ namespace gameracers.Dialogue
         public void NextHoleText(int val)
         {
             string[] line = holeText.text.Split("\n");
+            if (val >= line.Length) return;
             db.UpdateText("Game Master", line[val]);
         }
 

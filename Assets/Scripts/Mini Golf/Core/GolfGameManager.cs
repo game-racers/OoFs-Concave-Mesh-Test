@@ -8,6 +8,7 @@ using TMPro;
 using gameracers.MiniGolf.Aesthetics;
 using Unity.VisualScripting;
 using gameracers.Dialogue;
+using System;
 
 namespace gameracers.MiniGolf.Core
 {
@@ -39,7 +40,6 @@ namespace gameracers.MiniGolf.Core
         [SerializeField] List<GameObject> holes = new List<GameObject>();
         [SerializeField] GameObject mainLand;
         [SerializeField] GameObject hole3Cover;
-        [SerializeField] GameObject hole8Cover;
 
         private void Start()
         {
@@ -69,7 +69,6 @@ namespace gameracers.MiniGolf.Core
             player.GetComponent<MiniGolfPlayerController>().ResetSwings();
             totalScore += currentHoleScore;
             UpdateScore();
-
             ChangeGameState(MiniGolfState.InBetween);
             ballEnterTimer = Time.time;
         }
@@ -107,6 +106,7 @@ namespace gameracers.MiniGolf.Core
 
                     //playercam fades away from black
                     blackScreen.DOColor(Color.clear, beginDur);
+                    DialogueManager.dm.NextHoleText(0);
                     ChangeGameState(MiniGolfState.MiniGolf);
                     startTimer = -Mathf.Infinity;
                 }
@@ -124,6 +124,10 @@ namespace gameracers.MiniGolf.Core
                 {
                     if (canChangeHole == true) 
                         NextHole();
+                }
+                if (ballEnterTimer == Mathf.Infinity && currentHole == 9 - 1)
+                {
+                    NextHole();
                 }
 
                 return;
@@ -197,12 +201,7 @@ namespace gameracers.MiniGolf.Core
                 ChangeGameState(MiniGolfState.EndScreen);
                 UpdateScore();
                 scoreBoard.gameObject.SetActive(true);
-                if (totalScore > 37)
-                    AudioManager.am.PlayDialogue(currentHole + 2);
-                else if (totalScore == 37)
-                    AudioManager.am.PlayDialogue(currentHole + 3);
-                else
-                    AudioManager.am.PlayDialogue(currentHole + 4);
+                mainLand.SetActive(true);
                 return;
             }
 
@@ -217,7 +216,6 @@ namespace gameracers.MiniGolf.Core
 
             claw.MoveToPos(holes[currentHole].transform.Find("Hole Start").position);
 
-            Debug.Log(currentHole);
             switch (currentHole + 1)
             {
                 case 1:
@@ -249,7 +247,6 @@ namespace gameracers.MiniGolf.Core
                     break;
                 case 9:
                     mainLand.SetActive(false);
-                    hole8Cover.SetActive(true);
                     break;
             }
         }

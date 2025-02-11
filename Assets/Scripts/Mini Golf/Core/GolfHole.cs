@@ -49,7 +49,6 @@ namespace gameracers.MiniGolf.Core
                     claw.GrabTransform(GameObject.FindWithTag("Player").transform);
                     claw.transform.DOMove(claw.transform.position + Vector3.up * clawVertMovement, moveDur);
                     timer = Mathf.Infinity;
-                    //scoreBoard.gameObject.SetActive(true);
                 }
             }
         }

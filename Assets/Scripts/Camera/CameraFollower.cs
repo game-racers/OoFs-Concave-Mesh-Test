@@ -25,6 +25,7 @@ namespace gameracers.Camera
         bool doMove = false;
 
         [SerializeField] Material[] wallMats;
+        [SerializeField] float reduceBuffer = .5f;
 
         private void OnEnable()
         {
@@ -62,7 +63,7 @@ namespace gameracers.Camera
             startingHeight = cam.localPosition.y;
             foreach (Material mat in wallMats)
             {
-                mat.SetFloat("_SeeThroughDist", Mathf.Abs(cam.localPosition.z));
+                mat.SetFloat("_SeeThroughDist", Mathf.Abs(cam.localPosition.z) - reduceBuffer);
             }
         }
 
@@ -82,7 +83,7 @@ namespace gameracers.Camera
 
                 foreach (Material mat in wallMats)
                 {
-                    mat.SetFloat("_SeeThroughDist", Mathf.Abs(cam.localPosition.z));
+                    mat.SetFloat("_SeeThroughDist", Mathf.Abs(cam.localPosition.z) - reduceBuffer);
                 }
             }
             // Zoom Out
@@ -96,7 +97,7 @@ namespace gameracers.Camera
 
                 foreach (Material mat in wallMats)
                 {
-                    mat.SetFloat("_SeeThroughDist", Mathf.Abs(cam.localPosition.z));
+                    mat.SetFloat("_SeeThroughDist", Mathf.Abs(cam.localPosition.z) - reduceBuffer);
                 }
             }
             #endregion

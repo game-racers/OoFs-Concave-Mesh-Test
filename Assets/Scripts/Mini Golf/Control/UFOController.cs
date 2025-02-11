@@ -53,11 +53,10 @@ namespace gameracers.MiniGolf.Control
             {
                 transform.DOLocalMove(Vector3.up * 2f, moveDur).SetEase(Ease.OutQuad);
                 player.GetComponent<MiniGolfPlayerController>().StopInput(true);
-
+                GolfEventListener.BallSunkInHole(player);
                 return;
             }
 
-            Debug.Log(moveSpots.GetChild(3 - health).name);
             transform.DOMove(moveSpots.GetChild(3 - health).position, moveDur).SetEase(Ease.OutQuad);
         }
     }

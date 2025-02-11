@@ -16,9 +16,12 @@ public class WaterHazard : MonoBehaviour
     {
         if ((badMask & (1 << gameObject.layer)) != 0)
         {
-            Debug.Log("Hello World");
             if (collision.gameObject.tag == "Player")
             {
+                pc = collision.transform.GetComponent<MiniGolfPlayerController>();
+                if (pc.GetHazard()) return;
+
+                pc.SetHazard();
                 waterHazard.SetActive(true);
                 timer = Time.time;
                 pc = collision.transform.GetComponent<MiniGolfPlayerController>();
@@ -35,6 +38,7 @@ public class WaterHazard : MonoBehaviour
             if (Time.time - timer > punishmentDelay)
             {
                 pc.AddSwing(true);
+                pc.ResetHazard();
                 pc = null;
                 waterHazard.SetActive(false);
             }
