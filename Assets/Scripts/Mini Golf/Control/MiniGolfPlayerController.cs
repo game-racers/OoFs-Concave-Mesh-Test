@@ -246,6 +246,15 @@ namespace gameracers.MiniGolf.Control
             }
         }
 
+        public void ReturnToLastPos(bool addSwing)
+        {
+            if (addSwing)
+                AddSwing(false);
+
+            transform.position = lastPos;
+            StopInput(false);
+        }
+
         public void ResetSwings()
         {
             swings = 0;

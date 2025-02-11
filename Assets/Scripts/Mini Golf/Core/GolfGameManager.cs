@@ -41,6 +41,8 @@ namespace gameracers.MiniGolf.Core
         [SerializeField] GameObject mainLand;
         [SerializeField] GameObject hole3Cover;
 
+        bool endGame = false;
+
         private void Start()
         {
             //Application.targetFrameRate = 60;
@@ -63,8 +65,10 @@ namespace gameracers.MiniGolf.Core
             GolfEventListener.onClawDrop -= RoundStart;
         }
 
-        private void InBetweenHoles(Transform player)
+        private void InBetweenHoles(Transform entity)
         {
+            if (!GameObject.ReferenceEquals(player.gameObject, entity.gameObject))
+                endGame = true;
             currentHoleScore = player.GetComponent<MiniGolfPlayerController>().GetSwings();
             player.GetComponent<MiniGolfPlayerController>().ResetSwings();
             totalScore += currentHoleScore;
@@ -96,6 +100,16 @@ namespace gameracers.MiniGolf.Core
 
         private void Update()
         {
+            if (endGame == true)
+            {
+                // reveal Game Over Screen
+                ChangeGameState(MiniGolfState.EndScreen);
+                UpdateScore();
+                scoreBoard.gameObject.SetActive(true);
+                mainLand.SetActive(true);
+                return;
+            }
+
             if (startTimer != -Mathf.Infinity)
             {
                 if (Time.time - startTimer > beginDur)
@@ -195,9 +209,9 @@ namespace gameracers.MiniGolf.Core
         public void NextHole()
         {
             // move player by moving claw
-            if (currentHole == holes.Count)
+            if (endGame == true || currentHole == holes.Count)
             {
-                // reveal Game Over Screen en
+                // reveal Game Over Screen
                 ChangeGameState(MiniGolfState.EndScreen);
                 UpdateScore();
                 scoreBoard.gameObject.SetActive(true);
@@ -209,6 +223,17 @@ namespace gameracers.MiniGolf.Core
             holes[currentHole].SetActive(false);
             canChangeHole = false;
             currentHole += 1;
+
+            if (currentHole == holes.Count)
+            {
+                // reveal Game Over Screen
+                ChangeGameState(MiniGolfState.EndScreen);
+                UpdateScore();
+                scoreBoard.gameObject.SetActive(true);
+                mainLand.SetActive(true);
+                mainLand.layer = LayerMask.NameToLayer("Grass");
+                return;
+            }
 
             AudioManager.am.PlayDialogue(currentHole + 1);
             holes[currentHole].SetActive(true);
@@ -251,6 +276,11 @@ namespace gameracers.MiniGolf.Core
             }
         }
 
+        public void EndGame()
+        {
+            endGame = true;   
+        }
+
         public void ChangeGameState(MiniGolfState newState)
         {
             gameState = newState;
@@ -260,6 +290,13 @@ namespace gameracers.MiniGolf.Core
         public MiniGolfState GetGameState()
         {
             return gameState;
+        }
+
+        public void ResetHole()
+        {
+            player.GetComponent<MiniGolfPlayerController>().ResetSwings();
+
+            player.position = holes[currentHole].transform.Find("Hole Start").position;
         }
 
         public void ChangeFPS(int val)
