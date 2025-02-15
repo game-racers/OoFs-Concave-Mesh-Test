@@ -30,7 +30,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _QueueControl: 0
-    - _SeeThroughDist: 5.46664
+    - _SeeThroughDist: 4.1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
