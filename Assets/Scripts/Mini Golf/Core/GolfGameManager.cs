@@ -41,6 +41,10 @@ namespace gameracers.MiniGolf.Core
         [SerializeField] GameObject mainLand;
         [SerializeField] GameObject hole3Cover;
 
+        [SerializeField] float cutsceneDur = 5f;
+        [SerializeField] float cutsceneTransitionDur = 1f;
+        float cutsceneTimer = Mathf.Infinity;
+
         bool endGame = false;
 
         private void Start()
@@ -110,66 +114,88 @@ namespace gameracers.MiniGolf.Core
                 return;
             }
 
-            if (startTimer != -Mathf.Infinity)
+            switch (gameState)
             {
-                if (Time.time - startTimer > beginDur)
-                {
-                    // switch cams
-                    mainCam.SetActive(false);
-                    player.Find("CameraCenter").GetChild(0).gameObject.SetActive(true);
+                case (MiniGolfState.GameStart):
 
-                    //playercam fades away from black
-                    blackScreen.DOColor(Color.clear, beginDur);
-                    DialogueManager.dm.NextHoleText(0);
-                    ChangeGameState(MiniGolfState.MiniGolf);
-                    startTimer = -Mathf.Infinity;
-                }
-            }
-
-            if (gameState == MiniGolfState.InBetween)
-            {
-                if (Time.time - ballEnterTimer > ballEnterDur)
-                {
-                    canChangeHole = true;
-                    scoreBoard.gameObject.SetActive(true);
-                    ballEnterTimer = Mathf.Infinity;
-                }
-                if (ballEnterTimer == Mathf.Infinity && Input.anyKeyDown)
-                {
-                    if (canChangeHole == true) 
-                        NextHole();
-                }
-                if (ballEnterTimer == Mathf.Infinity && currentHole == 9 - 1)
-                {
-                    NextHole();
-                }
-
-                return;
-            }    
-
-            if (gameState == MiniGolfState.EndScreen)
-            {
-                if (Time.time - ballEnterTimer > ballEnterDur)
-                {
-                    canChangeHole = true;
-                    scoreBoard.gameObject.SetActive(true);
-                    ballEnterTimer = Mathf.Infinity;
-                }
-                if (ballEnterTimer == Mathf.Infinity && Input.anyKeyDown)
-                {
-                    if (canChangeHole == true)
+                    if (startTimer != -Mathf.Infinity)
                     {
-                        blackScreen.DOColor(Color.black, beginDur);
-                        // Credits is already displayed due to the Play Button actually deactivates "Main Menu" and activates "Credits" under the Main Menu Canvas
-                        blackScreen.DOColor(Color.clear, beginDur);
-                        ChangeGameState(MiniGolfState.GameStart);
-                        ResetScore();
+                        if (Time.time - startTimer > beginDur)
+                        {
+                            // switch cams
+                            mainCam.SetActive(false);
+                            player.Find("CameraCenter").GetChild(0).gameObject.SetActive(true);
+
+                            //playercam fades away from black
+                            blackScreen.DOColor(Color.clear, beginDur);
+                            DialogueManager.dm.NextHoleText(0);
+                            ChangeGameState(MiniGolfState.MiniGolf);
+                            startTimer = -Mathf.Infinity;
+                        }
                     }
-                }
+
+                    return;
+                case (MiniGolfState.PauseScreen):
+                    PauseGame();
+                    break;
+                case (MiniGolfState.MiniGolf):
+                    PauseGame();
+                    break;
+                case (MiniGolfState.InBetween):
+
+                    if (Time.time - ballEnterTimer > ballEnterDur)
+                    {
+                        canChangeHole = true;
+                        scoreBoard.gameObject.SetActive(true);
+                        ballEnterTimer = Mathf.Infinity;
+                    }
+                    if (ballEnterTimer == Mathf.Infinity && Input.anyKeyDown)
+                    {
+                        if (canChangeHole == true)
+                            NextHole();
+                    }
+                    if (ballEnterTimer == Mathf.Infinity && currentHole == 9 - 1)
+                    {
+                        NextHole();
+                    }
+
+                    return;
+                case (MiniGolfState.Cutscene):
+                    if (Time.time - cutsceneTimer > cutsceneDur + cutsceneTransitionDur) 
+                    { 
+                        
+                    }
+
+                    break;
+                case (MiniGolfState.EndScreen):
+
+                    if (gameState == MiniGolfState.EndScreen)
+                    {
+                        if (Time.time - ballEnterTimer > ballEnterDur)
+                        {
+                            canChangeHole = true;
+                            scoreBoard.gameObject.SetActive(true);
+                            ballEnterTimer = Mathf.Infinity;
+                        }
+                        if (ballEnterTimer == Mathf.Infinity && Input.anyKeyDown)
+                        {
+                            if (canChangeHole == true)
+                            {
+                                blackScreen.DOColor(Color.black, beginDur);
+                                // Credits is already displayed due to the Play Button actually deactivates "Main Menu" and activates "Credits" under the Main Menu Canvas
+                                blackScreen.DOColor(Color.clear, beginDur);
+                                ChangeGameState(MiniGolfState.GameStart);
+                                ResetScore();
+                            }
+                        }
+                    }
+
+                    break;
             }
+        }
 
-            if (gameState == MiniGolfState.GameStart) return;
-
+        private void PauseGame()
+        {
             if (Input.GetButtonDown("Cancel"))
             {
                 if (gameState == MiniGolfState.PauseScreen)
@@ -240,6 +266,9 @@ namespace gameracers.MiniGolf.Core
             scoreBoard.gameObject.SetActive(false);
 
             claw.MoveToPos(holes[currentHole].transform.Find("Hole Start").position);
+            ChangeGameState(MiniGolfState.Cutscene);
+            cutsceneTimer = Time.time;
+            //cutsceneCam image.DoFillAmount(1f, 1f).SetLoops(1, LoopType.Yoyo);
 
             switch (currentHole + 1)
             {
@@ -276,11 +305,6 @@ namespace gameracers.MiniGolf.Core
             }
         }
 
-        public void EndGame()
-        {
-            endGame = true;   
-        }
-
         public void ChangeGameState(MiniGolfState newState)
         {
             gameState = newState;
@@ -294,6 +318,10 @@ namespace gameracers.MiniGolf.Core
 
         public void ResetHole()
         {
+            /*  This function is used by the cheats menu. Therefore it is never called in script. 
+             *  Resets player's swings and teleports them to the start position. 
+             */
+
             player.GetComponent<MiniGolfPlayerController>().ResetSwings();
 
             player.position = holes[currentHole].transform.Find("Hole Start").position;
@@ -301,6 +329,10 @@ namespace gameracers.MiniGolf.Core
 
         public void ChangeFPS(int val)
         {
+            /*  This function is used by the cheats menu. Therefore it is never called in script. 
+             *  Changes FPS of the game based off of the dropdown option in the options menu. 
+             */
+
             switch (val)
             {
                 case 0: // 30 fps
@@ -331,6 +363,7 @@ namespace gameracers.MiniGolf.Core
         PauseScreen,
         MiniGolf,
         InBetween, 
+        Cutscene, 
         EndScreen
     }
 }

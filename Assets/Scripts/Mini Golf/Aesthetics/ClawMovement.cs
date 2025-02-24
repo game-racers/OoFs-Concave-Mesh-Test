@@ -1,4 +1,5 @@
 using DG.Tweening;
+using gameracers.MiniGolf.Core;
 using UnityEngine;
 
 namespace gameracers.MiniGolf.Aesthetics
@@ -25,7 +26,17 @@ namespace gameracers.MiniGolf.Aesthetics
         [SerializeField] float moveTimer = 1.5f;
         [SerializeField] float dropDelay = .5f;
         float timer = Mathf.Infinity;
-        
+
+
+        public void OnEnable()
+        {
+            GolfEventListener.onChangeGameState += OpenClaw;
+        }
+
+        public void OnDisable()
+        {
+            GolfEventListener.onChangeGameState -= OpenClaw;
+        }
 
         void Start()
         {
@@ -53,6 +64,12 @@ namespace gameracers.MiniGolf.Aesthetics
             }
         }
 
+        public void OpenClaw(MiniGolfState state)
+        {
+            if (state == MiniGolfState.MiniGolf)
+                OpenClaw();
+        }
+
         public void CloseClaw()
         {
             claw1Hinge.DORotate(claw1Close, openDur);
@@ -71,16 +88,6 @@ namespace gameracers.MiniGolf.Aesthetics
             if (hasTransform == true)
             {
                 heldTransform.transform.position = transform.position;
-            }
-
-            if (timer != Mathf.Infinity)
-            {
-                if (Time.time - timer > moveTimer + dropDelay)
-                {
-                    OpenClaw();
-                    timer = Mathf.Infinity;
-                    GolfEventListener.RoundStart();
-                }
             }
         }
     }
