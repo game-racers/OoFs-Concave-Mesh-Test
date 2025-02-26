@@ -110,7 +110,7 @@ Material:
     - _Parallax: 0.02
     - _QueueControl: -1
     - _QueueOffset: 0
-    - _SeeThroughDist: 4.1
+    - _SeeThroughDist: 4.0999985
     - _Smoothness: 0.68
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1

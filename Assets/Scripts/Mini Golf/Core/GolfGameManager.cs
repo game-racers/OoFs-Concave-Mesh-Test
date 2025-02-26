@@ -2,18 +2,18 @@ using UnityEngine.UI;
 using UnityEngine;
 using DG.Tweening;
 using System.Collections.Generic;
-using UnityEngine.Assertions.Must;
 using gameracers.MiniGolf.Control;
 using TMPro;
 using gameracers.MiniGolf.Aesthetics;
-using Unity.VisualScripting;
 using gameracers.Dialogue;
-using System;
+using Cinemachine;
 
 namespace gameracers.MiniGolf.Core
 {
     public class GolfGameManager : MonoBehaviour
     {
+        public static GolfGameManager ggm;
+
         [SerializeField] MiniGolfState gameState = MiniGolfState.GameStart;
         MiniGolfState lastState = MiniGolfState.GameStart;
         [SerializeField] GameObject pauseMenu;
@@ -27,7 +27,7 @@ namespace gameracers.MiniGolf.Core
         [SerializeField] float ballEnterTimer;
 
         [SerializeField] float beginDur = 3f;
-        [SerializeField] GameObject mainCam;
+        [SerializeField] GameObject mainMenuVCam;
 
         Transform player;
         int currentHole = 0;
@@ -41,11 +41,26 @@ namespace gameracers.MiniGolf.Core
         [SerializeField] GameObject mainLand;
         [SerializeField] GameObject hole3Cover;
 
-        [SerializeField] float cutsceneDur = 5f;
+        [SerializeField] float cutsceneDur = 10f;
         [SerializeField] float cutsceneTransitionDur = 1f;
+        bool didCutsceneStart = false;
+        bool didCutsceneFade;
         float cutsceneTimer = Mathf.Infinity;
+        CinemachineVirtualCamera cutsceneCam;
 
         bool endGame = false;
+
+        private void Awake()
+        {
+            if (ggm == null)
+                ggm = this;
+            else
+            {
+                Destroy(gameObject);
+                return;
+            }
+            DontDestroyOnLoad(gameObject);
+        }
 
         private void Start()
         {
@@ -123,13 +138,16 @@ namespace gameracers.MiniGolf.Core
                         if (Time.time - startTimer > beginDur)
                         {
                             // switch cams
-                            mainCam.SetActive(false);
-                            player.Find("CameraCenter").GetChild(0).gameObject.SetActive(true);
+                            mainMenuVCam.SetActive(false);
 
                             //playercam fades away from black
                             blackScreen.DOColor(Color.clear, beginDur);
                             DialogueManager.dm.NextHoleText(0);
-                            ChangeGameState(MiniGolfState.MiniGolf);
+                            ChangeGameState(MiniGolfState.Cutscene);
+                            cutsceneCam = holes[currentHole].transform.Find("Virtual Camera").GetComponent<CinemachineVirtualCamera>();
+                            cutsceneCam.gameObject.SetActive(true);
+                            DOTween.To(() => cutsceneCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathPosition, x => cutsceneCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathPosition = x, 1, cutsceneDur);
+                            cutsceneTimer = Time.time;
                             startTimer = -Mathf.Infinity;
                         }
                     }
@@ -161,9 +179,26 @@ namespace gameracers.MiniGolf.Core
 
                     return;
                 case (MiniGolfState.Cutscene):
-                    if (Time.time - cutsceneTimer > cutsceneDur + cutsceneTransitionDur) 
-                    { 
-                        
+                    if (Time.time - cutsceneTimer > cutsceneTransitionDur && didCutsceneStart == false) 
+                    {
+                        didCutsceneStart = true;
+                        didCutsceneFade = false;
+                        cutsceneCam = holes[currentHole].transform.Find("Virtual Camera").GetComponent<CinemachineVirtualCamera>();
+                    }
+
+                    if (Time.time - cutsceneTimer > cutsceneDur - cutsceneTransitionDur && didCutsceneFade == false)
+                    {
+                        didCutsceneFade = true;
+                        blackScreen.DOColor(Color.black, cutsceneTransitionDur);
+                    }
+
+                    if (Time.time - cutsceneTimer > cutsceneDur)
+                    {
+                        cutsceneTimer = Mathf.Infinity;
+                        cutsceneCam.gameObject.SetActive(false);
+                        cutsceneCam = null;
+                        blackScreen.DOColor(Color.clear, cutsceneDur);
+                        ChangeGameState(MiniGolfState.MiniGolf);
                     }
 
                     break;
@@ -265,10 +300,14 @@ namespace gameracers.MiniGolf.Core
             holes[currentHole].SetActive(true);
             scoreBoard.gameObject.SetActive(false);
 
+            // Cutscene Stuff
             claw.MoveToPos(holes[currentHole].transform.Find("Hole Start").position);
             ChangeGameState(MiniGolfState.Cutscene);
             cutsceneTimer = Time.time;
-            //cutsceneCam image.DoFillAmount(1f, 1f).SetLoops(1, LoopType.Yoyo);
+            blackScreen.DOColor(Color.black, 1f).SetLoops(1, LoopType.Yoyo);
+            didCutsceneStart = false;
+            cutsceneCam = holes[currentHole].transform.Find("Virtual Camera").GetComponent<CinemachineVirtualCamera>();
+            DOTween.To(() => cutsceneCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathPosition, x => cutsceneCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathPosition = x, 1, cutsceneDur);
 
             switch (currentHole + 1)
             {

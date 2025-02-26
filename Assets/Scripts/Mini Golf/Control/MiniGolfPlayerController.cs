@@ -16,6 +16,7 @@ namespace gameracers.MiniGolf.Control
     {
         Transform cam;
         Transform facing;
+        Transform items;
         Vector3 lastDir;
 
         [SerializeField] Transform powerDisplay;
@@ -94,6 +95,9 @@ namespace gameracers.MiniGolf.Control
 
                 return;
             }
+
+            // Update Equipment Facing
+            
 
             // update canStrike
             if (canSwing == false || !Input.GetMouseButton(0))
