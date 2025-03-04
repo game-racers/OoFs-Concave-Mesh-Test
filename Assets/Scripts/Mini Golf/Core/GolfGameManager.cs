@@ -47,7 +47,7 @@ namespace gameracers.MiniGolf.Core
         bool didCutsceneFade;
         float cutsceneTimer = Mathf.Infinity;
         CinemachineVirtualCamera cutsceneCam;
-        float specialCutsceneDur = 5f;
+        [SerializeField] float specialCutsceneDur = 5f;
 
         bool endGame = false;
 
@@ -303,15 +303,6 @@ namespace gameracers.MiniGolf.Core
             holes[currentHole].SetActive(true);
             scoreBoard.gameObject.SetActive(false);
 
-            // Cutscene Stuff
-            claw.MoveToPos(holes[currentHole].transform.Find("Hole Start").position);
-            ChangeGameState(MiniGolfState.Cutscene);
-            cutsceneTimer = Time.time;
-            blackScreen.DOColor(Color.black, cutsceneTransitionDur);
-            didCutsceneStart = false;
-            cutsceneCam = holes[currentHole].transform.Find("Virtual Camera").GetComponent<CinemachineVirtualCamera>();
-            DOTween.To(() => cutsceneCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathPosition, x => cutsceneCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathPosition = x, 1, cutsceneDur);
-
             switch (currentHole + 1)
             {
                 case 1:
@@ -340,11 +331,22 @@ namespace gameracers.MiniGolf.Core
                     break;
                 case 8:
                     mainLand.SetActive(false);
+                    cutsceneDur += specialCutsceneDur;
                     break;
                 case 9:
                     mainLand.SetActive(false);
+                    cutsceneDur -= specialCutsceneDur;
                     break;
             }
+
+            // Cutscene Stuff
+            claw.MoveToPos(holes[currentHole].transform.Find("Hole Start").position);
+            ChangeGameState(MiniGolfState.Cutscene);
+            cutsceneTimer = Time.time;
+            blackScreen.DOColor(Color.black, cutsceneTransitionDur);
+            didCutsceneStart = false;
+            cutsceneCam = holes[currentHole].transform.Find("Virtual Camera").GetComponent<CinemachineVirtualCamera>();
+            DOTween.To(() => cutsceneCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathPosition, x => cutsceneCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathPosition = x, 1, cutsceneDur);
         }
 
         public void ChangeGameState(MiniGolfState newState)
