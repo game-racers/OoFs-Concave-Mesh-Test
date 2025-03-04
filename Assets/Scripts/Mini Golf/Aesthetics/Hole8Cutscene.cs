@@ -13,6 +13,7 @@ namespace gameracers.MiniGolf.Aesthetics
         [SerializeField] List<Transform> finalBrokenIslandBits = new List<Transform>();
         [SerializeField] Transform tempVolcano;
         [SerializeField] Transform finalVolcano;
+        [SerializeField] GameObject golfHole;
 
 
         [SerializeField] float stageOneDur = 3f;
@@ -21,8 +22,6 @@ namespace gameracers.MiniGolf.Aesthetics
         bool ending = false;
         float timer = Mathf.Infinity;
 
-        [SerializeField] float speed = 5.0f;
-        [SerializeField] float intensity = 0.1f;
 
         private void OnEnable()
         {
@@ -42,7 +41,6 @@ namespace gameracers.MiniGolf.Aesthetics
             }
         }
 
-        // Start is called before the first frame update
         void Start()
         {
             timer = Time.time;
@@ -54,11 +52,8 @@ namespace gameracers.MiniGolf.Aesthetics
                 child.DOLocalMoveY(0, stageOneDur).SetEase(Ease.OutQuad);
             }
             tempVolcano.DOLocalMoveY(-0.7550011f, stageOneDur + stageTwoDur).SetEase(Ease.InOutSine);
-
-            
         }
 
-        // Update is called once per frame
         void Update()
         {
             if (ending == true && Time.time - timer > stageOneDur + stageTwoDur + 1f)
@@ -66,6 +61,7 @@ namespace gameracers.MiniGolf.Aesthetics
                 foreach (Transform child in finalBrokenIslandBits)
                     child.gameObject.SetActive(true);
                 finalVolcano.gameObject.SetActive(true);
+                golfHole.SetActive(true);
                 timer = Mathf.Infinity;
                 this.gameObject.SetActive(false);
             }

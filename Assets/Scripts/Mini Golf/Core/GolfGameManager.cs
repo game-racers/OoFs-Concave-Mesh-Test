@@ -48,8 +48,9 @@ namespace gameracers.MiniGolf.Core
         float cutsceneTimer = Mathf.Infinity;
         CinemachineVirtualCamera cutsceneCam;
         [SerializeField] float specialCutsceneDur = 5f;
+        bool endGame = false;   
 
-        bool endGame = false;
+        [SerializeField] GameObject menuBG;
 
         private void Awake()
         {
@@ -87,14 +88,16 @@ namespace gameracers.MiniGolf.Core
 
         private void InBetweenHoles(Transform entity)
         {
-            if (!GameObject.ReferenceEquals(player.gameObject, entity.gameObject))
-                endGame = true;
             currentHoleScore = player.GetComponent<MiniGolfPlayerController>().GetSwings();
             player.GetComponent<MiniGolfPlayerController>().ResetSwings();
             totalScore += currentHoleScore;
             UpdateScore();
             ChangeGameState(MiniGolfState.InBetween);
             ballEnterTimer = Time.time;
+            if (!GameObject.ReferenceEquals(player.gameObject, entity.gameObject))
+            {
+                endGame = true;
+            }
         }
 
         private void RoundStart()
@@ -127,6 +130,15 @@ namespace gameracers.MiniGolf.Core
                 UpdateScore();
                 scoreBoard.gameObject.SetActive(true);
                 mainLand.SetActive(true);
+                endGame = false;
+                Debug.Log("I think it goes from here");
+                if (totalScore > 37)
+                    AudioManager.am.PlayDialogue(10);
+                if (totalScore == 37)
+                    AudioManager.am.PlayDialogue(11);
+                if (totalScore < 37)
+                    AudioManager.am.PlayDialogue(12);
+                ballEnterTimer = Time.time;
                 return;
             }
 
@@ -206,25 +218,37 @@ namespace gameracers.MiniGolf.Core
 
                     break;
                 case (MiniGolfState.EndScreen):
-
-                    if (gameState == MiniGolfState.EndScreen)
+                    if (Time.time - ballEnterTimer > ballEnterDur)
                     {
-                        if (Time.time - ballEnterTimer > ballEnterDur)
+                        canChangeHole = true;
+                        scoreBoard.gameObject.SetActive(true);
+                        ballEnterTimer = Mathf.Infinity;
+                        Debug.Log("First");
+                    }
+                    if (ballEnterTimer == Mathf.Infinity && Input.anyKeyDown)
+                    {
+                        if (canChangeHole == true)
                         {
-                            canChangeHole = true;
-                            scoreBoard.gameObject.SetActive(true);
-                            ballEnterTimer = Mathf.Infinity;
+                            Debug.Log("Should go to start");
+                            blackScreen.DOColor(Color.black, beginDur);
+                            // Credits is already displayed due to the Play Button actually deactivates "Main Menu" and activates "Credits" under the Main Menu Canvas
+                            scoreBoard.gameObject.SetActive(false);
+                            startTimer = Time.time;
+                            ResetScore();
                         }
-                        if (ballEnterTimer == Mathf.Infinity && Input.anyKeyDown)
+                    }
+                    if (startTimer != -Mathf.Infinity)
+                    {
+                        if (Time.time - startTimer > beginDur)
                         {
-                            if (canChangeHole == true)
-                            {
-                                blackScreen.DOColor(Color.black, beginDur);
-                                // Credits is already displayed due to the Play Button actually deactivates "Main Menu" and activates "Credits" under the Main Menu Canvas
-                                blackScreen.DOColor(Color.clear, beginDur);
-                                ChangeGameState(MiniGolfState.GameStart);
-                                ResetScore();
-                            }
+                            blackScreen.DOColor(Color.clear, beginDur);
+                            startTimer = -Mathf.Infinity;
+                            mainMenuVCam.SetActive(true);
+                            scoreBoard.gameObject.SetActive(false);
+                            menuBG.SetActive(true);
+                            ChangeGameState(MiniGolfState.GameStart);
+                            Cursor.lockState = CursorLockMode.None;
+                            Cursor.visible = true;
                         }
                     }
 
@@ -276,7 +300,9 @@ namespace gameracers.MiniGolf.Core
             if (endGame == true || currentHole == holes.Count)
             {
                 // reveal Game Over Screen
+                Debug.Log("This one");
                 ChangeGameState(MiniGolfState.EndScreen);
+                ballEnterTimer = Time.time;
                 UpdateScore();
                 scoreBoard.gameObject.SetActive(true);
                 mainLand.SetActive(true);
@@ -291,8 +317,10 @@ namespace gameracers.MiniGolf.Core
             if (currentHole == holes.Count)
             {
                 // reveal Game Over Screen
+                Debug.Log("Or this one");
                 ChangeGameState(MiniGolfState.EndScreen);
                 UpdateScore();
+                ballEnterTimer = Time.time;
                 scoreBoard.gameObject.SetActive(true);
                 mainLand.SetActive(true);
                 mainLand.layer = LayerMask.NameToLayer("Grass");
@@ -369,6 +397,18 @@ namespace gameracers.MiniGolf.Core
             player.GetComponent<MiniGolfPlayerController>().ResetSwings();
 
             player.position = holes[currentHole].transform.Find("Hole Start").position;
+        }
+
+        public void CheatNextHole()
+        {
+            if (holes[currentHole].transform.Find("Golf Hole") == null)
+            {
+                Debug.Log("OOps");
+                return;
+            }
+            player.position = holes[currentHole].transform.Find("Golf Hole").position;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         public void ChangeFPS(int val)

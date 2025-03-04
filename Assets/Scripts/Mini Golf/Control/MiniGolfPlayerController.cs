@@ -96,8 +96,6 @@ namespace gameracers.MiniGolf.Control
                 return;
             }
 
-            // Update Equipment Facing
-            
 
             // update canStrike
             if (canSwing == false || !Input.GetMouseButton(0))
